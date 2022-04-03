@@ -1,0 +1,132 @@
+swagger: "2.0"
+info:
+  version: 1.0.0
+  title: API
+  description: ""
+
+host: localhost
+basePath: /api/v1
+produces: [ application/json ]
+schemes: [ http, https ]
+consumes: [ application/json ]
+
+paths:
+  /products:
+    get:
+      summary: Get products
+      tags:
+        - Products
+      parameters:
+        - $ref: '#/parameters/category'
+        - $ref: '#/parameters/price_less'
+      responses:
+        200:
+          description: 'Get products'
+          schema:
+            $ref: '#/definitions/ProductsResponse'
+        default:
+          "$ref": "#/definitions/ErrorResponse"
+
+parameters:
+  category:
+    name: category
+    type: string
+    in: query
+    required: false
+    minLength: 1
+    maxLength: 255
+  price_less:
+    name: price_less
+    type: integer
+    in: query
+    required: false
+
+definitions:
+  ErrorResponseItem:
+    properties:
+      code:
+        type: integer
+        minimum: 0
+        description: "Error code"
+        example: 1001
+      message:
+        type: string
+        description: "Error message"
+        example: "Some error message"
+      field:
+        type: string
+        description: "Fields with errors"
+        example: "name"
+    type: object
+
+  ErrorResponse:
+    properties:
+      message:
+        description: "Error message"
+        example: "Something went wrong"
+        type: string
+      errors:
+        description: "Error details"
+        items:
+          $ref: "#/definitions/ErrorResponseItem"
+        type: array
+    type: object
+
+  ProductsResponse:
+    properties:
+      products:
+        description: "Products list"
+        items:
+          $ref: "#/definitions/Product"
+        type: array
+    type: object
+
+  Product:
+    required:
+      - sku
+      - name
+      - category
+      - price
+      - discount_percentage
+      - currency
+    properties:
+      sku:
+        type: string
+        description: "sku"
+        example: "0001"
+      name:
+        type: string
+        description: "Product name"
+        example: "BV Lean leather ankle boots"
+      category:
+        type: string
+        description: "Product category"
+        example: "boots"
+      price:
+        x-nullable: false
+        x-omitempty: false
+        $ref: '#/definitions/Price'
+      discount_percentage:
+        type: string
+        description: "Product discount percentage"
+        example: "100%"
+      currency:
+        type: string
+        description: "Product currency"
+        example: "EUR"
+    type: object
+
+  Price:
+    required:
+      - original
+      - final
+    properties:
+      original:
+        type: number
+        minimum: 0
+        description: "Original price"
+      final:
+        type: number
+        minimum: 0
+        description: "Final price"
+    type: object
